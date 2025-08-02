@@ -21,17 +21,50 @@ router.get('/github/callback',
       // Generate JWT token
       const token = generateGitHubToken(user);
 
-      // Redirect to frontend with token
-      const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      // Send HTML page that posts message to parent window
+      const userData = {
         id: user._id,
         username: user.username,
         displayName: user.displayName,
         email: user.email,
         avatar: user.avatar,
         status: user.status
-      }))}`;
+      };
 
-      res.redirect(redirectUrl);
+      const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>GitHub OAuth Callback</title>
+        </head>
+        <body>
+          <script>
+            try {
+              // Send message to parent window
+              if (window.opener) {
+                window.opener.postMessage({
+                  type: 'github-auth-success',
+                  token: '${token}',
+                  user: ${JSON.stringify(userData)}
+                }, 'http://localhost:3000');
+                
+                // Close this window
+                window.close();
+              } else {
+                // Fallback: redirect with parameters
+                window.location.href = 'http://localhost:3000/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}';
+              }
+            } catch (error) {
+              console.error('GitHub callback error:', error);
+              window.location.href = 'http://localhost:3000/auth/callback?error=callback_failed';
+            }
+          </script>
+          <p>GitHub girişi tamamlanıyor...</p>
+        </body>
+        </html>
+      `;
+
+      res.send(html);
     } catch (error) {
       console.error('GitHub callback error:', error);
       res.redirect('/auth/failure');

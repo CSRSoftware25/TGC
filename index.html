@@ -596,6 +596,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('token');
             const user = urlParams.get('user');
+            const error = urlParams.get('error');
+            
+            if (error) {
+                console.error('GitHub OAuth error:', error);
+                alert('GitHub girişi başarısız oldu: ' + error);
+                return;
+            }
             
             if (token && user) {
                 try {
@@ -615,7 +622,7 @@
                         // Clear URL parameters
                         window.history.replaceState({}, document.title, window.location.pathname);
                         
-                        alert(`${userData.displayName} olarak GitHub ile giriş yapıldı!`);
+                        console.log('✅ GitHub OAuth başarılı:', userData.displayName);
                     }
                 } catch (error) {
                     console.error('GitHub callback error:', error);

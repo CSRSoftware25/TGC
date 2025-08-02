@@ -121,7 +121,7 @@ class AuthManager {
             this.currentUser = data.user;
             this.token = token;
             this.isAuthenticated = true;
-
+            
             // Connect to socket with authentication
             this.connectSocket();
 
@@ -230,40 +230,43 @@ class AuthManager {
         return this.token;
     }
 
-    // GitHub OAuth login
+    // GitHub OAuth login (Mock for testing)
     async githubLogin() {
         try {
-            // Get GitHub OAuth URL from server
-            const response = await fetch(`${this.serverUrl}/auth/github/url`);
-            const data = await response.json();
+            console.log('🚀 GitHub OAuth başlatılıyor...');
             
-            if (data.authUrl) {
-                // Open GitHub OAuth in new window
-                const authWindow = window.open(data.authUrl, 'github-auth', 'width=500,height=600');
+            // Mock GitHub OAuth for testing
+            const mockUser = {
+                id: 'mock-github-user-123',
+                username: 'testuser',
+                displayName: 'Test GitHub User',
+                email: 'test@github.com',
+                avatar: 'https://avatars.githubusercontent.com/u/123?v=4',
+                status: 'online'
+            };
+            
+            const mockToken = 'mock-jwt-token-' + Date.now();
+            
+            // Simulate OAuth process
+            setTimeout(() => {
+                console.log('✅ Mock GitHub OAuth başarılı!');
                 
-                // Listen for callback
-                window.addEventListener('message', (event) => {
-                    if (event.origin !== window.location.origin) return;
-                    
-                    if (event.data.type === 'github-auth-success') {
-                        this.token = event.data.token;
-                        this.currentUser = event.data.user;
-                        this.isAuthenticated = true;
-                        
-                        localStorage.setItem('miyav_token', this.token);
-                        localStorage.setItem('miyav_user', JSON.stringify(this.currentUser));
-                        
-                        this.connectSocket();
-                        this.updateUI();
-                        
-                        if (authWindow) {
-                            authWindow.close();
-                        }
-                    }
-                });
-            }
+                this.token = mockToken;
+                this.currentUser = mockUser;
+                this.isAuthenticated = true;
+                
+                localStorage.setItem('miyav_token', this.token);
+                localStorage.setItem('miyav_user', JSON.stringify(this.currentUser));
+                
+                this.connectSocket();
+                this.updateUI();
+                
+                alert(`${mockUser.displayName} olarak GitHub ile giriş yapıldı! (Test Modu)`);
+            }, 2000);
+            
         } catch (error) {
-            console.error('GitHub login error:', error);
+            console.error('❌ GitHub login error:', error);
+            alert('GitHub girişi başarısız oldu: ' + error.message);
         }
     }
 
@@ -272,7 +275,7 @@ class AuthManager {
         const loginBtn = document.getElementById('login-btn');
         const userNameElement = document.getElementById('user-name');
         const userStatusElement = document.getElementById('user-status');
-
+        
         if (this.isAuthenticated && this.currentUser) {
             // User is logged in
             if (loginBtn) {
@@ -349,8 +352,8 @@ class AuthManager {
             modal.classList.add('show');
         }
     }
-
-    // Show register modal
+        
+        // Show register modal
     showRegisterModal() {
         const modal = document.getElementById('register-modal');
         if (modal) {
