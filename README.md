@@ -129,4 +129,4 @@ MIT License - Detaylar için LICENSE dosyasına bakın.
 
 ---
 
-**Turkish Gaming Chat** - Türkiye'nin oyun sohbet platformu 🎮✨ 
+**Turkish Gaming Chat** - Türkiye'nin oyun sohbet platformu 🎮✨
