@@ -1072,6 +1072,73 @@ body {
     text-decoration: underline;
 }
 
+/* About Modal Styles */
+.about-container {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.about-logo {
+    margin-bottom: 20px;
+}
+
+.about-info h4 {
+    color: #ffffff;
+    font-size: 20px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.about-info p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.attribution {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.attribution h5 {
+    color: #58a6ff;
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.attribution p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.attribution a {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
+}
+
+.version-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.version-info p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin: 5px 0;
+}
+
 /* Verification Info */
 .verification-info {
     background: rgba(210, 105, 30, 0.1);

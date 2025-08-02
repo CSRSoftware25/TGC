@@ -66,6 +66,9 @@
                 <button class="btn-icon" id="user-settings" onclick="showUserSettings()">
                     <i class="fas fa-cog"></i>
                 </button>
+                <button class="btn-icon" id="about-btn" onclick="showAbout()" title="Hakkında">
+                    <i class="fas fa-info-circle"></i>
+                </button>
                 <button class="btn-icon" id="login-btn">
                     <i class="fas fa-sign-in-alt"></i>
                 </button>
@@ -274,6 +277,48 @@
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="window.friendsManager.hideModal('new-dm-modal')">İptal</button>
                 <button class="btn-primary" onclick="window.friendsManager.handleCreateDM()">DM Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Miyav Hakkında</h2>
+                <button class="btn-close" id="close-about-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="about-container">
+                    <div class="about-logo">
+                        <img src="assets/miyavlogooriginal.png" alt="Miyav Logo" style="width: 80px; height: 80px; border-radius: 50%;">
+                    </div>
+                    <div class="about-info">
+                        <h4>Miyav - Türkiye'nin Oyun Sohbet Platformu</h4>
+                        <p>GitHub hesabınızla hızlıca giriş yapın ve arkadaşlarınızla sohbet edin.</p>
+                        
+                        <div class="attribution">
+                            <h5>Geliştirici</h5>
+                            <p><strong>CSR Software</strong></p>
+                            
+                            <h5>GitHub</h5>
+                            <p><a href="https://github.com/CSRSoftware25/Miyav" target="_blank">github.com/CSRSoftware25/Miyav</a></p>
+                            
+                            <h5>Lisans</h5>
+                            <p>MIT License - Açık Kaynak</p>
+                        </div>
+                        
+                        <div class="version-info">
+                            <p><strong>Versiyon:</strong> 1.0.1</p>
+                            <p><strong>Platform:</strong> macOS, Windows</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="hideModal('about-modal')">Kapat</button>
             </div>
         </div>
     </div>
@@ -691,6 +736,11 @@
             
             // Show user settings modal
             document.getElementById('user-settings-modal').classList.add('show');
+        }
+
+        // Show about modal
+        function showAbout() {
+            document.getElementById('about-modal').classList.add('show');
         }
 
         // Show add friend modal
