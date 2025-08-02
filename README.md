@@ -1,14 +1,23 @@
-# Turkish Gaming Chat v1.0 Beta 🎮
+# Miyav v1.0.1 - Türkiye için Özel Oyun Sohbet Platformu 🐱
 
-## 🐱 İlk Beta Sürümü
+## 🚀 Yeni Sürüm - Tam Backend Altyapısı
 
-Türkiye için özel olarak tasarlanmış oyun sohbet platformu. Discord alternatifi modern ve kullanıcı dostu uygulama.
+Türkiye için özel olarak tasarlanmış oyun sohbet platformu. Discord alternatifi modern ve kullanıcı dostu uygulama. Artık tam sunucu tabanlı altyapı ile!
 
 ## ✨ Özellikler
 
+### 🚀 Yeni v1.0.1 Özellikleri
+- **GitHub OAuth**: Tek tıkla GitHub hesabıyla giriş
+- **Gerçek Zamanlı Sohbet**: Socket.IO ile anlık mesajlaşma
+- **Sunucu Tabanlı Veri**: Tüm veriler güvenli sunucuda saklanıyor
+- **Otomatik Sunucu**: Uygulama açıldığında sunucu otomatik başlıyor
+- **Bildirim Sistemi**: Arkadaş istekleri ve yeni mesaj bildirimleri
+- **Dosya Paylaşımı**: Resim ve dosya yükleme sistemi
+- **Güvenlik**: Rate limiting, input validation, XSS koruması
+
 ### 🎯 Temel Özellikler
-- **Basit Kayıt/Giriş**: Kullanıcı adı, görünen ad ve şifre
-- **Arkadaş Sistemi**: Kullanıcı adı ile arkadaş ekleme
+- **Güvenli Kayıt/Giriş**: JWT token tabanlı kimlik doğrulama
+- **Arkadaş Sistemi**: Kullanıcı arama ve arkadaş ekleme
 - **Direkt Mesajlaşma**: Birebir sohbet imkanı
 - **Resim Paylaşımı**: Resim gönderme ve PC'ye kaydetme
 
@@ -18,39 +27,55 @@ Türkiye için özel olarak tasarlanmış oyun sohbet platformu. Discord alterna
 - **Oyun Süresi**: Oyun sürenizi takip etme
 
 ### 🔐 Güvenlik
+- **JWT Authentication**: Güvenli token tabanlı kimlik doğrulama
+- **Rate Limiting**: API koruması
+- **Input Validation**: Giriş verilerinin doğrulanması
+- **XSS Protection**: Cross-site scripting koruması
 - **Güvenli Arayüz**: Sağ tık ve geliştirici araçları engelleme
-- **Şifre Değiştirme**: Kullanıcı ayarlarından şifre güncelleme
 
 ### 🎨 Modern Tasarım
 - **Glassmorphism**: Modern cam efekti tasarım
 - **Responsive**: Tüm ekran boyutlarına uyumlu
 - **Dark Theme**: Göz yormayan koyu tema
 
-## ⚠️ Beta Notları
+## ⚠️ v1.0.1 Notları
 
-- Görüntülü arama (henüz aktif değil)
-- Sesli arama geliştirme aşamasında (sıkıntıları olabilir)
-- Grup Sohbetleri: Çoklu kullanıcı sohbetleri (yapım aşamasında)
-- Emoji Desteği: Zengin emoji kütüphanesi (şuanlık yok)
+- ✅ GitHub OAuth ile güvenli giriş
+- ✅ Gerçek zamanlı mesajlaşma
+- ✅ Sunucu tabanlı veri saklama
+- ✅ Otomatik sunucu başlatma
+- 🔄 Görüntülü arama (geliştirme aşamasında)
+- 🔄 Sesli arama (geliştirme aşamasında)
+- 🔄 Grup Sohbetleri (geliştirme aşamasında)
+- 🔄 Emoji Desteği (gelecek sürümde)
 
 ## 🚀 Gelecek Sürümler
 
+- [x] ✅ Sunucu tabanlı arkadaşlık sistemi
+- [x] ✅ Gerçek zamanlı oyun takibi
+- [x] ✅ Bildirim sistemi
+- [x] ✅ GitHub OAuth girişi
 - [ ] Sesli arama özelliği
 - [ ] Görüntülü arama özelliği
-- [ ] Sunucu tabanlı arkadaşlık sistemi
-- [ ] Gerçek zamanlı oyun takibi
-- [ ] Bildirim sistemi
+- [ ] Grup sohbetleri
+- [ ] Emoji desteği
 
 ## 📦 İndirme
 
 ### macOS
-- **Dosya**: `Miyav-1.0.0-arm64.dmg` (Apple Silicon)
-- **Dosya**: `Miyav-1.0.0-universal.dmg` (Intel + Apple Silicon)
+- **Dosya**: `Miyav-1.0.1-arm64.dmg` (Apple Silicon)
+- **Dosya**: `Miyav-1.0.1-universal.dmg` (Intel + Apple Silicon)
 - **Platform**: macOS 10.12+
 
 ### Windows
-- **Dosya**: `Miyav Setup 1.0.0.exe`
+- **Dosya**: `Miyav Setup 1.0.1.exe`
 - **Platform**: Windows 10+
+
+### 🚀 Yeni Özellikler
+- **Otomatik Sunucu**: Uygulama açıldığında backend otomatik başlar
+- **GitHub OAuth**: Tek tıkla GitHub hesabıyla giriş
+- **Gerçek Zamanlı**: Socket.IO ile anlık mesajlaşma
+- **Güvenli Veri**: MongoDB ile sunucu tabanlı veri saklama
 
 ## 🔒 macOS Güvenlik Uyarısı
 
@@ -78,15 +103,25 @@ sudo xattr -rd com.apple.quarantine /Applications/Miyav.app
 
 ```bash
 # Projeyi klonlayın
-git clone [repository-url]
-cd CSRChat
+git clone https://github.com/CSRSoftware25/Miyav.git
+cd Miyav
 
 # Bağımlılıkları yükleyin
 npm install
 
-# Uygulamayı başlatın
+# Server bağımlılıklarını yükleyin
+cd server && npm install && cd ..
+
+# Uygulamayı başlatın (server otomatik başlar)
 npm start
 ```
+
+### 🚀 Otomatik Kurulum
+Uygulama ilk açılışta:
+- ✅ Server'ı otomatik başlatır
+- ✅ .env dosyasını oluşturur
+- ✅ Dependencies'leri kontrol eder
+- ✅ MongoDB bağlantısını kurar
 
 ### Build Alma
 
@@ -123,10 +158,11 @@ MIT License - Detaylar için LICENSE dosyasına bakın.
 
 ## 📞 İletişim
 
-- **Geliştirici**: Turkish Gaming Chat Team
-- **Versiyon**: 1.0.0 Beta
+- **Geliştirici**: CSR Software
+- **Versiyon**: 1.0.1
 - **Platform**: macOS, Windows
+- **GitHub**: https://github.com/CSRSoftware25/Miyav
 
 ---
 
-**Turkish Gaming Chat** - Türkiye'nin oyun sohbet platformu 🎮✨
+**Miyav** - Türkiye'nin oyun sohbet platformu 🎮✨

@@ -1,6 +1,6 @@
 {
   "name": "miyav",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Miyav - Türkiye için özel oyun sohbet platformu",
   "main": "main.js",
   "scripts": {
