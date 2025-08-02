@@ -230,6 +230,43 @@ class AuthManager {
         return this.token;
     }
 
+    // GitHub OAuth login
+    async githubLogin() {
+        try {
+            // Get GitHub OAuth URL from server
+            const response = await fetch(`${this.serverUrl}/auth/github/url`);
+            const data = await response.json();
+            
+            if (data.authUrl) {
+                // Open GitHub OAuth in new window
+                const authWindow = window.open(data.authUrl, 'github-auth', 'width=500,height=600');
+                
+                // Listen for callback
+                window.addEventListener('message', (event) => {
+                    if (event.origin !== window.location.origin) return;
+                    
+                    if (event.data.type === 'github-auth-success') {
+                        this.token = event.data.token;
+                        this.currentUser = event.data.user;
+                        this.isAuthenticated = true;
+                        
+                        localStorage.setItem('miyav_token', this.token);
+                        localStorage.setItem('miyav_user', JSON.stringify(this.currentUser));
+                        
+                        this.connectSocket();
+                        this.updateUI();
+                        
+                        if (authWindow) {
+                            authWindow.close();
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('GitHub login error:', error);
+        }
+    }
+
     // Update UI based on authentication status
     updateUI() {
         const loginBtn = document.getElementById('login-btn');
@@ -432,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-show register modal if no user is logged in
     setTimeout(() => {
         if (!window.authManager.isUserAuthenticated()) {
-            window.authManager.showRegisterModal();
+            window.authManager.showLoginModal();
         }
     }, 1000);
 }); 

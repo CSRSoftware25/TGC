@@ -204,6 +204,12 @@
                 </form>
                 <div class="form-footer">
                     <p>Zaten hesabınız var mı? <a href="#" id="show-login">Giriş yap</a></p>
+                    <div class="oauth-buttons">
+                        <button type="button" class="btn-github" onclick="loginWithGitHub()">
+                            <i class="fab fa-github"></i>
+                            GitHub ile Kayıt Ol
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -228,7 +234,12 @@
                 </form>
                 <div class="form-footer">
                     <p>Hesabınız yok mu? <a href="#" id="show-register">Kayıt ol</a></p>
-                    <p><a href="#" id="forgot-password">Şifremi unuttum</a></p>
+                    <div class="oauth-buttons">
+                        <button type="button" class="btn-github" onclick="loginWithGitHub()">
+                            <i class="fab fa-github"></i>
+                            GitHub ile Giriş Yap
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -573,6 +584,46 @@
             }
         }
 
+        // GitHub OAuth login function
+        function loginWithGitHub() {
+            if (window.authManager) {
+                window.authManager.githubLogin();
+            }
+        }
+
+        // Handle GitHub OAuth callback
+        function handleGitHubCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const user = urlParams.get('user');
+            
+            if (token && user) {
+                try {
+                    const userData = JSON.parse(decodeURIComponent(user));
+                    
+                    if (window.authManager) {
+                        window.authManager.token = token;
+                        window.authManager.currentUser = userData;
+                        window.authManager.isAuthenticated = true;
+                        
+                        localStorage.setItem('miyav_token', token);
+                        localStorage.setItem('miyav_user', JSON.stringify(userData));
+                        
+                        window.authManager.connectSocket();
+                        window.authManager.updateUI();
+                        
+                        // Clear URL parameters
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        
+                        alert(`${userData.displayName} olarak GitHub ile giriş yapıldı!`);
+                    }
+                } catch (error) {
+                    console.error('GitHub callback error:', error);
+                    alert('GitHub girişi başarısız oldu.');
+                }
+            }
+        }
+
         // Show register modal
         function showRegisterModal() {
             document.getElementById('register-modal').classList.add('show');
@@ -595,11 +646,14 @@
                 window.authManager.init();
             }
             
-            // Show register modal if no user logged in
+            // Handle GitHub OAuth callback
+            handleGitHubCallback();
+            
+            // Show login modal if no user logged in
             if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 setTimeout(() => {
                     if (window.authManager) {
-                        window.authManager.showRegisterModal();
+                        window.authManager.showLoginModal();
                     }
                 }, 1000);
             }

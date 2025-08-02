@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 20
   },
+  githubId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
   displayName: {
     type: String,
     required: true,
@@ -25,7 +30,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function() {
+      return !this.githubId; // Password not required for GitHub users
+    },
     minlength: 6
   },
   avatar: {

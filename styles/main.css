@@ -980,6 +980,45 @@ body {
     color: #ffffff;
 }
 
+/* GitHub OAuth Button */
+.btn-github {
+    background: linear-gradient(135deg, #24292e 0%, #2f363d 100%);
+    color: #ffffff;
+    border: 2px solid #586069;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 15px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.btn-github:hover {
+    background: linear-gradient(135deg, #2f363d 0%, #24292e 100%);
+    border-color: #6a737d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.btn-github i {
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.oauth-buttons {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Verification Info */
 .verification-info {
     background: rgba(210, 105, 30, 0.1);

@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const session = require('express-session');
 require('dotenv').config();
 
 // Import database connection
@@ -23,6 +24,7 @@ const {
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const githubAuthRoutes = require('./routes/github-auth');
 const friendsRoutes = require('./routes/friends');
 const gamesRoutes = require('./routes/games');
 const uploadRoutes = require('./routes/upload');
@@ -46,6 +48,19 @@ const io = socketIo(server, {
 // Connect to database
 connectDB();
 
+// Session middleware for GitHub OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'miyav-session-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+
+// Passport middleware
+const { passport } = require('./middleware/github-auth');
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Middleware
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -62,6 +77,7 @@ app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/auth', githubAuthRoutes);
 app.use('/api/friends', friendsRoutes);
 app.use('/api/games', gamesRoutes);
 app.use('/api/upload', uploadRoutes);
