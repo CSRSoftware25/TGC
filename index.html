@@ -180,35 +180,23 @@
     <div class="modal" id="register-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Hesap Oluştur</h2>
+                <h2>GitHub ile Giriş Yap</h2>
             </div>
             <div class="modal-body">
-                <form id="register-form">
-                    <div class="form-group">
-                        <label for="register-username">Kullanıcı Adı</label>
-                        <input type="text" id="register-username" required>
+                <div class="github-auth-container">
+                    <div class="github-auth-info">
+                        <i class="fab fa-github"></i>
+                        <h3>Miyav'a Hoş Geldiniz!</h3>
+                        <p>GitHub hesabınızla hızlıca giriş yapın ve arkadaşlarınızla sohbet edin.</p>
                     </div>
-                    <div class="form-group">
-                        <label for="register-display-name">Görünen Ad</label>
-                        <input type="text" id="register-display-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-password">Şifre</label>
-                        <input type="password" id="register-password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-confirm-password">Şifre Tekrar</label>
-                        <input type="password" id="register-confirm-password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Hesap Oluştur</button>
-                </form>
-                <div class="form-footer">
-                    <p>Zaten hesabınız var mı? <a href="#" id="show-login">Giriş yap</a></p>
                     <div class="oauth-buttons">
                         <button type="button" class="btn-github" onclick="loginWithGitHub()">
                             <i class="fab fa-github"></i>
-                            GitHub ile Kayıt Ol
+                            GitHub ile Giriş Yap
                         </button>
+                    </div>
+                    <div class="auth-footer">
+                        <p>GitHub hesabınız yok mu? <a href="https://github.com/join" target="_blank">GitHub'da hesap oluşturun</a></p>
                     </div>
                 </div>
             </div>
@@ -218,27 +206,23 @@
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Giriş Yap</h2>
+                <h2>GitHub ile Giriş Yap</h2>
             </div>
             <div class="modal-body">
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="login-username">Kullanıcı Adı</label>
-                        <input type="text" id="login-username" required>
+                <div class="github-auth-container">
+                    <div class="github-auth-info">
+                        <i class="fab fa-github"></i>
+                        <h3>Miyav'a Hoş Geldiniz!</h3>
+                        <p>GitHub hesabınızla hızlıca giriş yapın ve arkadaşlarınızla sohbet edin.</p>
                     </div>
-                    <div class="form-group">
-                        <label for="login-password">Şifre</label>
-                        <input type="password" id="login-password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Giriş Yap</button>
-                </form>
-                <div class="form-footer">
-                    <p>Hesabınız yok mu? <a href="#" id="show-register">Kayıt ol</a></p>
                     <div class="oauth-buttons">
                         <button type="button" class="btn-github" onclick="loginWithGitHub()">
                             <i class="fab fa-github"></i>
                             GitHub ile Giriş Yap
                         </button>
+                    </div>
+                    <div class="auth-footer">
+                        <p>GitHub hesabınız yok mu? <a href="https://github.com/join" target="_blank">GitHub'da hesap oluşturun</a></p>
                     </div>
                 </div>
             </div>

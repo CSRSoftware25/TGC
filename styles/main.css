@@ -1019,6 +1019,59 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* GitHub Auth Container */
+.github-auth-container {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.github-auth-info {
+    margin-bottom: 30px;
+}
+
+.github-auth-info i {
+    font-size: 48px;
+    color: #ffffff;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.github-auth-info h3 {
+    color: #ffffff;
+    font-size: 24px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.github-auth-info p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+.auth-footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-footer p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin: 0;
+}
+
+.auth-footer a {
+    color: #58a6ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
 /* Verification Info */
 .verification-info {
     background: rgba(210, 105, 30, 0.1);

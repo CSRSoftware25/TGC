@@ -230,12 +230,68 @@ class AuthManager {
         return this.token;
     }
 
-    // GitHub OAuth login (Mock for testing)
+    // GitHub OAuth login (with fallback to mock)
     async githubLogin() {
         try {
             console.log('🚀 GitHub OAuth başlatılıyor...');
             
-            // Mock GitHub OAuth for testing
+            // Try to get GitHub OAuth URL from server
+            try {
+                const response = await fetch(`${this.serverUrl}/auth/github/url`);
+                const data = await response.json();
+                
+                if (data.authUrl) {
+                    // Open GitHub OAuth in new window
+                    const authWindow = window.open(data.authUrl, 'github-auth', 'width=500,height=600');
+                    
+                    if (!authWindow) {
+                        alert('Popup engellendi! Lütfen popup\'ları etkinleştirin.');
+                        return;
+                    }
+                    
+                    // Check if window is closed
+                    const checkClosed = setInterval(() => {
+                        if (authWindow.closed) {
+                            clearInterval(checkClosed);
+                            console.log('GitHub OAuth window kapandı');
+                        }
+                    }, 1000);
+                    
+                    // Listen for callback from server
+                    const handleCallback = (event) => {
+                        console.log('📨 Message received:', event.data);
+                        
+                        if (event.origin !== 'http://localhost:3001' && event.origin !== 'file://') return;
+                        
+                        if (event.data && event.data.type === 'github-auth-success') {
+                            console.log('✅ GitHub OAuth başarılı!');
+                            
+                            this.token = event.data.token;
+                            this.currentUser = event.data.user;
+                            this.isAuthenticated = true;
+                            
+                            localStorage.setItem('miyav_token', this.token);
+                            localStorage.setItem('miyav_user', JSON.stringify(this.currentUser));
+                            
+                            this.connectSocket();
+                            this.updateUI();
+                            
+                            if (authWindow) {
+                                authWindow.close();
+                            }
+                            
+                            window.removeEventListener('message', handleCallback);
+                        }
+                    };
+                    
+                    window.addEventListener('message', handleCallback);
+                    return;
+                }
+            } catch (serverError) {
+                console.log('⚠️ Server bağlantısı yok, mock moda geçiliyor...');
+            }
+            
+            // Fallback to mock GitHub OAuth
             const mockUser = {
                 id: 'mock-github-user-123',
                 username: 'testuser',
@@ -378,89 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.authManager.init();
 });
 
-// Event listeners for login/register forms
+// GitHub OAuth is the only authentication method now
 document.addEventListener('DOMContentLoaded', () => {
-    // Login form
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-
-            const result = await window.authManager.login({ username, password });
-            
-            if (result.success) {
-                window.authManager.hideModal('login-modal');
-                alert(`${result.user.displayName} olarak giriş yapıldı.`);
-                
-                // Clear form
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-            } else {
-                alert(`Giriş başarısız: ${result.error}`);
-            }
-        });
-    }
-
-    // Register form
-    const registerForm = document.getElementById('register-form');
-    if (registerForm) {
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const username = document.getElementById('register-username').value;
-            const displayName = document.getElementById('register-display-name').value;
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-
-            if (password !== confirmPassword) {
-                alert('Şifreler eşleşmiyor.');
-                return;
-            }
-
-            const result = await window.authManager.register({
-                username,
-                displayName,
-                password
-            });
-            
-            if (result.success) {
-                window.authManager.hideModal('register-modal');
-                alert(`${result.user.displayName} hesabı başarıyla oluşturuldu!`);
-                
-                // Clear form
-                document.getElementById('register-username').value = '';
-                document.getElementById('register-display-name').value = '';
-                document.getElementById('register-password').value = '';
-                document.getElementById('register-confirm-password').value = '';
-            } else {
-                alert(`Kayıt başarısız: ${result.error}`);
-            }
-        });
-    }
-
-    // Modal navigation
-    const showLoginLink = document.getElementById('show-login');
-    const showRegisterLink = document.getElementById('show-register');
-
-    if (showLoginLink) {
-        showLoginLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.authManager.hideModal('register-modal');
-            window.authManager.showLoginModal();
-        });
-    }
-
-    if (showRegisterLink) {
-        showRegisterLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.authManager.hideModal('login-modal');
-            window.authManager.showRegisterModal();
-        });
-    }
-
     // Login button click
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
@@ -469,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auto-show register modal if no user is logged in
+    // Auto-show login modal if no user is logged in
     setTimeout(() => {
         if (!window.authManager.isUserAuthenticated()) {
             window.authManager.showLoginModal();
