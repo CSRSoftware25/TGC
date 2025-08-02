@@ -495,150 +495,81 @@
             }
         });
 
-        // Simple register function
+        // Server-based authentication functions
         function registerUser() {
-            const username = document.getElementById('register-username').value;
-            const displayName = document.getElementById('register-display-name').value;
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
+            if (window.authManager) {
+                const username = document.getElementById('register-username').value;
+                const displayName = document.getElementById('register-display-name').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
 
-            if (!username || !displayName || !password || !confirmPassword) {
-                alert('Tüm alanları doldurun.');
-                return;
+                if (!username || !displayName || !password || !confirmPassword) {
+                    alert('Tüm alanları doldurun.');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('Şifreler eşleşmiyor.');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('Şifre en az 6 karakter olmalı.');
+                    return;
+                }
+
+                window.authManager.register({
+                    username,
+                    displayName,
+                    password
+                }).then(result => {
+                    if (result.success) {
+                        document.getElementById('register-modal').classList.remove('show');
+                        alert(`${result.user.displayName} hesabı başarıyla oluşturuldu!`);
+                        
+                        // Clear form
+                        document.getElementById('register-username').value = '';
+                        document.getElementById('register-display-name').value = '';
+                        document.getElementById('register-password').value = '';
+                        document.getElementById('register-confirm-password').value = '';
+                    } else {
+                        alert(`Kayıt başarısız: ${result.error}`);
+                    }
+                });
             }
-
-            if (password !== confirmPassword) {
-                alert('Şifreler eşleşmiyor.');
-                return;
-            }
-
-            if (password.length < 6) {
-                alert('Şifre en az 6 karakter olmalı.');
-                return;
-            }
-
-            // Get existing users
-            const users = JSON.parse(localStorage.getItem('miyav_users') || '[]');
-            
-            // Check if username exists
-            if (users.find(u => u.username === username)) {
-                alert('Bu kullanıcı adı zaten kullanılıyor.');
-                return;
-            }
-
-            // Create new user
-            const newUser = {
-                id: Date.now().toString(),
-                username: username,
-                displayName: displayName,
-                password: btoa(password), // Simple hash
-                createdAt: new Date(),
-                verified: true
-            };
-
-            // Save user
-            users.push(newUser);
-            localStorage.setItem('miyav_users', JSON.stringify(users));
-
-            // Auto login
-            localStorage.setItem('miyav_current_user', JSON.stringify(newUser));
-
-            // Hide modal
-            document.getElementById('register-modal').classList.remove('show');
-
-            // Update UI
-            updateUserInterface();
-
-            alert(`${displayName} hesabı başarıyla oluşturuldu!`);
-
-            // Clear form
-            document.getElementById('register-username').value = '';
-            document.getElementById('register-display-name').value = '';
-            document.getElementById('register-password').value = '';
-            document.getElementById('register-confirm-password').value = '';
         }
 
-        // Simple login function
         function loginUser() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
+            if (window.authManager) {
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
 
-            if (!username || !password) {
-                alert('Kullanıcı adı ve şifre gerekli.');
-                return;
+                if (!username || !password) {
+                    alert('Kullanıcı adı ve şifre gerekli.');
+                    return;
+                }
+
+                window.authManager.login({
+                    username,
+                    password
+                }).then(result => {
+                    if (result.success) {
+                        document.getElementById('login-modal').classList.remove('show');
+                        alert(`${result.user.displayName} olarak giriş yapıldı.`);
+                        
+                        // Clear form
+                        document.getElementById('login-username').value = '';
+                        document.getElementById('login-password').value = '';
+                    } else {
+                        alert(`Giriş başarısız: ${result.error}`);
+                    }
+                });
             }
-
-            // Get users
-            const users = JSON.parse(localStorage.getItem('miyav_users') || '[]');
-            const user = users.find(u => u.username === username);
-
-            if (!user) {
-                alert('Kullanıcı adı bulunamadı.');
-                return;
-            }
-
-            if (user.password !== btoa(password)) {
-                alert('Şifre yanlış.');
-                return;
-            }
-
-            // Login successful
-            localStorage.setItem('miyav_current_user', JSON.stringify(user));
-
-            // Hide modal
-            document.getElementById('login-modal').classList.remove('show');
-
-            // Update UI
-            updateUserInterface();
-
-            alert(`${user.displayName} olarak giriş yapıldı.`);
-
-            // Clear form
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
         }
 
-        // Update UI function
         function updateUserInterface() {
-            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
-            
-            if (currentUser) {
-                // Update user info
-                const userNameElement = document.getElementById('user-name');
-                if (userNameElement) {
-                    userNameElement.textContent = currentUser.displayName;
-                }
-
-                // Hide login button, show settings
-                const loginBtn = document.getElementById('login-btn');
-                if (loginBtn) {
-                    loginBtn.style.display = 'none';
-                }
-
-                // Show welcome message
-                const chatName = document.getElementById('chat-name');
-                if (chatName) {
-                    chatName.textContent = `Hoş geldin, ${currentUser.displayName}!`;
-                }
-                
-                // Update DM list
-                updateDMList();
-                // Update friends list
-                updateFriendsList();
-                // Update right panel
-                updateRightPanel();
-            } else {
-                // Show login button
-                const loginBtn = document.getElementById('login-btn');
-                if (loginBtn) {
-                    loginBtn.style.display = 'block';
-                }
-
-                // Show default message
-                const chatName = document.getElementById('chat-name');
-                if (chatName) {
-                    chatName.textContent = 'Hoş Geldiniz';
-                }
+            if (window.authManager) {
+                window.authManager.updateUI();
             }
         }
 
@@ -659,14 +590,18 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            updateUserInterface();
+            // Initialize auth manager
+            if (window.authManager) {
+                window.authManager.init();
+            }
             
             // Show register modal if no user logged in
-            const currentUser = localStorage.getItem('tgc_current_user');
-            if (!currentUser) {
+            if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 setTimeout(() => {
-                    showRegisterModal();
-                }, 500);
+                    if (window.authManager) {
+                        window.authManager.showRegisterModal();
+                    }
+                }, 1000);
             }
             
             // Add Enter key listener for message input
@@ -691,8 +626,7 @@
 
         // Show user settings
         function showUserSettings() {
-            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
-            if (!currentUser) {
+            if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 alert('Giriş yapmanız gerekiyor.');
                 return;
             }
@@ -716,8 +650,7 @@
 
         // Show add friend modal
         function showAddFriendModal() {
-            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
-            if (!currentUser) {
+            if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 alert('Giriş yapmanız gerekiyor.');
                 return;
             }
@@ -728,42 +661,13 @@
 
         // Show new DM modal
         function showNewDMModal() {
-            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
-            if (!currentUser) {
+            if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 alert('Giriş yapmanız gerekiyor.');
                 return;
             }
             
-            // Get all registered users
-            const users = JSON.parse(localStorage.getItem('tgc_users') || '[]');
-            const availableUsers = users.filter(user => user.username !== currentUser.username);
-            
-            if (availableUsers.length === 0) {
-                alert('DM oluşturmak için başka kullanıcı bulunamadı.');
-                return;
-            }
-            
-            // Create user selector
-            const userSelector = document.createElement('select');
-            userSelector.innerHTML = '<option value="">Kullanıcı seçin...</option>';
-            availableUsers.forEach(user => {
-                userSelector.innerHTML += `<option value="${user.username}">${user.displayName}</option>`;
-            });
-            
-            // Show DM creation dialog
-            const username = prompt('DM oluşturmak istediğiniz kullanıcıyı seçin:\n\n' + 
-                availableUsers.map(user => `${user.displayName} (${user.username})`).join('\n') + 
-                '\n\nKullanıcı adını yazın:');
-            
-            if (username) {
-                const selectedUser = availableUsers.find(user => user.username === username);
-                if (selectedUser) {
-                    createDM(currentUser.username, selectedUser.username);
-                    alert(`${selectedUser.displayName} ile DM oluşturuldu!`);
-                } else {
-                    alert('Geçersiz kullanıcı adı.');
-                }
-            }
+            // TODO: Implement server-based DM creation
+            alert('DM oluşturma özelliği server entegrasyonu ile gelecek!');
         }
 
         // Create DM
@@ -960,27 +864,32 @@
             
             if (!content) return;
             
-            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
-            if (!currentUser) {
+            if (!window.authManager || !window.authManager.isUserAuthenticated()) {
                 alert('Giriş yapmanız gerekiyor.');
                 return;
             }
             
-            // Check if we're in a DM
-            const currentDM = localStorage.getItem('tgc_current_dm');
-            if (currentDM) {
-                sendMessageToDM(content);
-            } else {
-                // Send to general chat
-                const messageData = {
-                    id: Date.now().toString(),
-                    author: currentUser.displayName,
-                    content: content,
-                    timestamp: new Date()
-                };
-                
-                addMessageToChat(messageData);
+            const currentUser = window.authManager.getCurrentUser();
+            
+            // Send message via socket if connected
+            if (window.authManager.socket) {
+                window.authManager.socket.emit('send_message', {
+                    room: 'general',
+                    username: currentUser.displayName,
+                    message: content,
+                    type: 'text'
+                });
             }
+            
+            // Add message to UI
+            const messageData = {
+                id: Date.now().toString(),
+                author: currentUser.displayName,
+                content: content,
+                timestamp: new Date()
+            };
+            
+            addMessageToChat(messageData);
             
             // Clear input
             messageInput.value = '';
