@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miyav</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cat"></i>
+                    <span>Miyav</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <span>Arkadaşlar</span>
+                        <button class="btn-icon" id="add-friend" onclick="showAddFriendModal()">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                    </div>
+                    <div class="friends-list" id="friends-list">
+                        <!-- Friends will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <span>Direkt Mesajlar</span>
+                        <button class="btn-icon" id="new-dm" onclick="showNewDMModal()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="dm-list" id="dm-list">
+                        <!-- DMs will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <span>Gruplar</span>
+                        <button class="btn-icon" id="create-group" onclick="showComingSoon('Grup oluşturma özelliği gelecek sürümlerde aktif olacak!')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="groups-list" id="groups-list">
+                        <!-- Groups will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-name" id="user-name">Giriş Yap</div>
+                    <div class="user-status" id="user-status">Çevrimdışı</div>
+                </div>
+                <button class="btn-icon" id="user-settings" onclick="showUserSettings()">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="btn-icon" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-area">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-info">
+                    <div class="chat-name" id="chat-name">Hoş Geldiniz</div>
+                    <div class="chat-status" id="chat-status">Miyav'a hoş geldiniz!</div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn-icon" id="search-messages" title="Mesaj Ara">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn-icon" id="more-options" title="Daha Fazla" onclick="showMoreOptions()">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages-container" id="messages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h2>Miyav'a Hoş Geldiniz!</h2>
+                    <p>Arkadaşlarınızla oyun oynarken sohbet edin, oyun durumlarını paylaşın.</p>
+                    <div class="welcome-features">
+                        <div class="feature">
+                            <i class="fas fa-gamepad"></i>
+                            <span>Oyun Takibi</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-users"></i>
+                            <span>Arkadaş Sistemi</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-comment"></i>
+                            <span>Anlık Mesajlaşma</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <button class="btn-icon" id="attach-file" onclick="openFileSelector()" title="Dosya Ekle">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input type="text" id="message-input" placeholder="Mesajınızı yazın...">
+                    <button class="btn-icon" id="send-message" onclick="sendMessage()" title="Mesaj Gönder">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel (Profile/Game Info) -->
+        <div class="right-panel" id="right-panel">
+            <div class="panel-header">
+                <h3 id="panel-title">Profil</h3>
+                <button class="btn-icon" id="close-panel" onclick="closeRightPanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="panel-content" id="panel-content">
+                <div class="profile-summary">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h4 id="panel-user-name">Kullanıcı</h4>
+                        <p id="panel-user-status">Çevrimdışı</p>
+                    </div>
+                </div>
+                
+                <div class="game-status">
+                    <h5>Oyun Durumu</h5>
+                    <div class="current-game" id="panel-current-game">
+                        <span class="game-name">Oyun oynamıyor</span>
+                        <span class="game-time">0 dakika</span>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <h5>Hızlı İşlemler</h5>
+                    <button class="btn-secondary" onclick="showUserSettings()">
+                        <i class="fas fa-cog"></i>
+                        Ayarlar
+                    </button>
+                    <button class="btn-secondary" onclick="showAddFriendModal()">
+                        <i class="fas fa-user-plus"></i>
+                        Arkadaş Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Button (shows when panel is hidden) -->
+    <button class="profile-button" id="profile-button" onclick="showRightPanel()">
+        <i class="fas fa-user"></i>
+    </button>
+
+    <!-- Modals -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Hesap Oluştur</h2>
+            </div>
+            <div class="modal-body">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-username">Kullanıcı Adı</label>
+                        <input type="text" id="register-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-display-name">Görünen Ad</label>
+                        <input type="text" id="register-display-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Şifre</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Şifre Tekrar</label>
+                        <input type="password" id="register-confirm-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Hesap Oluştur</button>
+                </form>
+                <div class="form-footer">
+                    <p>Zaten hesabınız var mı? <a href="#" id="show-login">Giriş yap</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Giriş Yap</h2>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Kullanıcı Adı</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Şifre</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Giriş Yap</button>
+                </form>
+                <div class="form-footer">
+                    <p>Hesabınız yok mu? <a href="#" id="show-register">Kayıt ol</a></p>
+                    <p><a href="#" id="forgot-password">Şifremi unuttum</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="email-verification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>E-posta Doğrulama</h2>
+            </div>
+            <div class="modal-body">
+                <div class="verification-info">
+                    <i class="fas fa-envelope"></i>
+                    <p>E-posta adresinize doğrulama kodu gönderdik.</p>
+                    <p class="email-address" id="verification-email"></p>
+                </div>
+                <form id="verification-form">
+                    <div class="form-group">
+                        <label for="verification-code">Doğrulama Kodu</label>
+                        <input type="text" id="verification-code" maxlength="6" placeholder="000000" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Doğrula</button>
+                </form>
+                <div class="form-footer">
+                    <p>Kod gelmedi mi? <a href="#" id="resend-code">Tekrar gönder</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New DM Modal -->
+    <div id="new-dm-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Yeni DM Oluştur</h3>
+                <button class="modal-close" onclick="window.friendsManager.hideModal('new-dm-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="dm-user-selector">Kullanıcı Seç:</label>
+                    <select id="dm-user-selector" class="form-control">
+                        <option value="">Kullanıcı seçin...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.friendsManager.hideModal('new-dm-modal')">İptal</button>
+                <button class="btn-primary" onclick="window.friendsManager.handleCreateDM()">DM Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Friend Modal -->
+    <div class="modal" id="add-friend-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Arkadaş Ekle</h2>
+                <button class="btn-close" id="close-add-friend-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-friend-form">
+                    <div class="form-group">
+                        <label for="friend-username">Kullanıcı Adı</label>
+                        <input type="text" id="friend-username" placeholder="Kullanıcı adını girin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="friend-message">Mesaj (İsteğe bağlı)</label>
+                        <textarea id="friend-message" placeholder="Arkadaşlık isteği mesajı..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Arkadaşlık İsteği Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="create-group-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Grup Oluştur</h2>
+                <button class="btn-close" id="close-create-group-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-group-form">
+                    <div class="form-group">
+                        <label for="group-name">Grup Adı</label>
+                        <input type="text" id="group-name" placeholder="Grup adını girin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="group-description">Açıklama (İsteğe bağlı)</label>
+                        <textarea id="group-description" placeholder="Grup açıklaması..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="group-members">Üyeler</label>
+                        <div class="member-selector" id="member-selector">
+                            <!-- Member checkboxes will be added here -->
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Grup Oluştur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="user-settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Kullanıcı Ayarları</h2>
+                <button class="btn-close" id="close-user-settings-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="user-settings-form">
+                    <div class="settings-section">
+                        <h3>Profil Bilgileri</h3>
+                        <div class="form-group">
+                            <label for="settings-username">Kullanıcı Adı</label>
+                            <input type="text" id="settings-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-display-name">Görünen Ad</label>
+                            <input type="text" id="settings-display-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-password">Yeni Şifre (Boş bırakın değiştirmek istemiyorsanız)</label>
+                            <input type="password" id="settings-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="settings-password-confirm">Yeni Şifre Tekrar</label>
+                            <input type="password" id="settings-password-confirm">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>Oyun Takibi</h3>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="auto-startup">
+                            <label for="auto-startup">Bilgisayar açıldığında otomatik başlat</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="game-tracking">
+                            <label for="game-tracking">Oyun takibini etkinleştir</label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Bildirimler</h3>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="message-notifications">
+                            <label for="message-notifications">Mesaj bildirimleri</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="friend-notifications">
+                            <label for="friend-notifications">Arkadaş bildirimleri</label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Hesap Yönetimi</h3>
+                        <button class="btn-danger" onclick="deleteAccount()">
+                            <i class="fas fa-trash"></i>
+                            Hesabı Sil
+                        </button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Hakkında</h3>
+                        <p style="color: #cccccc; font-size: 12px; text-align: center; margin: 10px 0;">
+                            Miyav v1.0.0<br>
+                            CSR SOFTWARE 2025
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-primary" onclick="saveUserSettings()">Ayarları Kaydet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="profile-name">Kullanıcı Profili</h2>
+                <button class="btn-close" id="close-profile-modal" onclick="hideModal('profile-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-info">
+                    <div class="profile-details">
+                        <h3 id="profile-display-name">Kullanıcı Adı</h3>
+                        <p id="profile-status-text">Çevrimiçi</p>
+                    </div>
+                </div>
+                
+                <div class="game-info" id="game-info">
+                    <h4>Oyun Bilgileri</h4>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <span class="stat-label">Şu anki oyun:</span>
+                            <span class="stat-value" id="current-game">Counter-Strike 2</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Oyun süresi:</span>
+                            <span class="stat-value" id="game-time">2 saat 15 dakika</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Favori oyun:</span>
+                            <span class="stat-value" id="favorite-game">Counter-Strike 2</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Toplam oyun süresi:</span>
+                            <span class="stat-value" id="total-game-time">156 saat</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Son oyun:</span>
+                            <span class="stat-value" id="last-game">Bugün 15:30</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn-secondary" onclick="sendMessageToProfile()">
+                        <i class="fas fa-comment"></i>
+                        Mesaj Gönder
+                    </button>
+                    <button class="btn-secondary" onclick="addFriendFromProfile()">
+                        <i class="fas fa-user-plus"></i>
+                        Arkadaş Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/app.js"></script>
+    <script src="scripts/chat.js"></script>
+    <script src="scripts/voice.js"></script>
+    <script src="scripts/game-detection.js"></script>
+    <script src="scripts/friends.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/server.js"></script>
+    
+    <script>
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Disable F12, Ctrl+Shift+I, Ctrl+U
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Simple register function
+        function registerUser() {
+            const username = document.getElementById('register-username').value;
+            const displayName = document.getElementById('register-display-name').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+
+            if (!username || !displayName || !password || !confirmPassword) {
+                alert('Tüm alanları doldurun.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Şifreler eşleşmiyor.');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Şifre en az 6 karakter olmalı.');
+                return;
+            }
+
+            // Get existing users
+            const users = JSON.parse(localStorage.getItem('miyav_users') || '[]');
+            
+            // Check if username exists
+            if (users.find(u => u.username === username)) {
+                alert('Bu kullanıcı adı zaten kullanılıyor.');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                id: Date.now().toString(),
+                username: username,
+                displayName: displayName,
+                password: btoa(password), // Simple hash
+                createdAt: new Date(),
+                verified: true
+            };
+
+            // Save user
+            users.push(newUser);
+            localStorage.setItem('miyav_users', JSON.stringify(users));
+
+            // Auto login
+            localStorage.setItem('miyav_current_user', JSON.stringify(newUser));
+
+            // Hide modal
+            document.getElementById('register-modal').classList.remove('show');
+
+            // Update UI
+            updateUserInterface();
+
+            alert(`${displayName} hesabı başarıyla oluşturuldu!`);
+
+            // Clear form
+            document.getElementById('register-username').value = '';
+            document.getElementById('register-display-name').value = '';
+            document.getElementById('register-password').value = '';
+            document.getElementById('register-confirm-password').value = '';
+        }
+
+        // Simple login function
+        function loginUser() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                alert('Kullanıcı adı ve şifre gerekli.');
+                return;
+            }
+
+            // Get users
+            const users = JSON.parse(localStorage.getItem('miyav_users') || '[]');
+            const user = users.find(u => u.username === username);
+
+            if (!user) {
+                alert('Kullanıcı adı bulunamadı.');
+                return;
+            }
+
+            if (user.password !== btoa(password)) {
+                alert('Şifre yanlış.');
+                return;
+            }
+
+            // Login successful
+            localStorage.setItem('miyav_current_user', JSON.stringify(user));
+
+            // Hide modal
+            document.getElementById('login-modal').classList.remove('show');
+
+            // Update UI
+            updateUserInterface();
+
+            alert(`${user.displayName} olarak giriş yapıldı.`);
+
+            // Clear form
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+        }
+
+        // Update UI function
+        function updateUserInterface() {
+            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+            
+            if (currentUser) {
+                // Update user info
+                const userNameElement = document.getElementById('user-name');
+                if (userNameElement) {
+                    userNameElement.textContent = currentUser.displayName;
+                }
+
+                // Hide login button, show settings
+                const loginBtn = document.getElementById('login-btn');
+                if (loginBtn) {
+                    loginBtn.style.display = 'none';
+                }
+
+                // Show welcome message
+                const chatName = document.getElementById('chat-name');
+                if (chatName) {
+                    chatName.textContent = `Hoş geldin, ${currentUser.displayName}!`;
+                }
+                
+                // Update DM list
+                updateDMList();
+                // Update friends list
+                updateFriendsList();
+                // Update right panel
+                updateRightPanel();
+            } else {
+                // Show login button
+                const loginBtn = document.getElementById('login-btn');
+                if (loginBtn) {
+                    loginBtn.style.display = 'block';
+                }
+
+                // Show default message
+                const chatName = document.getElementById('chat-name');
+                if (chatName) {
+                    chatName.textContent = 'Hoş Geldiniz';
+                }
+            }
+        }
+
+        // Show register modal
+        function showRegisterModal() {
+            document.getElementById('register-modal').classList.add('show');
+        }
+
+        // Show login modal
+        function showLoginModal() {
+            document.getElementById('login-modal').classList.add('show');
+        }
+
+        // Hide modal
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUserInterface();
+            
+            // Show register modal if no user logged in
+            const currentUser = localStorage.getItem('tgc_current_user');
+            if (!currentUser) {
+                setTimeout(() => {
+                    showRegisterModal();
+                }, 500);
+            }
+            
+            // Add Enter key listener for message input
+            const messageInput = document.getElementById('message-input');
+            if (messageInput) {
+                messageInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+            
+            // Add right-click listener for messages
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.closest('.message')) {
+                    e.preventDefault();
+                    showMessageContextMenu(e);
+                }
+            });
+        });
+
+        // Show user settings
+        function showUserSettings() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Fill form fields with current user data
+            const usernameInput = document.getElementById('settings-username');
+            const displayNameInput = document.getElementById('settings-display-name');
+            const currentPasswordInput = document.getElementById('settings-current-password');
+            const newPasswordInput = document.getElementById('settings-new-password');
+            const confirmPasswordInput = document.getElementById('settings-confirm-password');
+            
+            if (usernameInput) usernameInput.value = currentUser.username;
+            if (displayNameInput) displayNameInput.value = currentUser.displayName;
+            if (currentPasswordInput) currentPasswordInput.value = '';
+            if (newPasswordInput) newPasswordInput.value = '';
+            if (confirmPasswordInput) confirmPasswordInput.value = '';
+            
+            // Show user settings modal
+            document.getElementById('user-settings-modal').classList.add('show');
+        }
+
+        // Show add friend modal
+        function showAddFriendModal() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Show add friend modal
+            document.getElementById('add-friend-modal').classList.add('show');
+        }
+
+        // Show new DM modal
+        function showNewDMModal() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Get all registered users
+            const users = JSON.parse(localStorage.getItem('tgc_users') || '[]');
+            const availableUsers = users.filter(user => user.username !== currentUser.username);
+            
+            if (availableUsers.length === 0) {
+                alert('DM oluşturmak için başka kullanıcı bulunamadı.');
+                return;
+            }
+            
+            // Create user selector
+            const userSelector = document.createElement('select');
+            userSelector.innerHTML = '<option value="">Kullanıcı seçin...</option>';
+            availableUsers.forEach(user => {
+                userSelector.innerHTML += `<option value="${user.username}">${user.displayName}</option>`;
+            });
+            
+            // Show DM creation dialog
+            const username = prompt('DM oluşturmak istediğiniz kullanıcıyı seçin:\n\n' + 
+                availableUsers.map(user => `${user.displayName} (${user.username})`).join('\n') + 
+                '\n\nKullanıcı adını yazın:');
+            
+            if (username) {
+                const selectedUser = availableUsers.find(user => user.username === username);
+                if (selectedUser) {
+                    createDM(currentUser.username, selectedUser.username);
+                    alert(`${selectedUser.displayName} ile DM oluşturuldu!`);
+                } else {
+                    alert('Geçersiz kullanıcı adı.');
+                }
+            }
+        }
+
+        // Create DM
+        function createDM(user1, user2) {
+            const dms = JSON.parse(localStorage.getItem('miyav_dms') || '[]');
+            const dmId = `dm_${Date.now()}`;
+            
+            const newDM = {
+                id: dmId,
+                participants: [user1, user2],
+                created: new Date(),
+                messages: []
+            };
+            
+            dms.push(newDM);
+            localStorage.setItem('miyav_dms', JSON.stringify(dms));
+            
+            // Update DM list
+            updateDMList();
+        }
+
+        // Update DM list
+        function updateDMList() {
+            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+            if (!currentUser) return;
+            
+            const dms = JSON.parse(localStorage.getItem('miyav_dms') || '[]');
+            const userDMs = dms.filter(dm => dm.participants.includes(currentUser.username));
+            
+            const dmList = document.getElementById('dm-list');
+            if (!dmList) return;
+            
+            dmList.innerHTML = '';
+            
+            if (userDMs.length === 0) {
+                dmList.innerHTML = '<div class="empty-state">Henüz DM yok</div>';
+                return;
+            }
+            
+            userDMs.forEach(dm => {
+                const otherUser = dm.participants.find(user => user !== currentUser.username);
+                const users = JSON.parse(localStorage.getItem('tgc_users') || '[]');
+                const otherUserData = users.find(user => user.username === otherUser);
+                
+                const dmElement = document.createElement('div');
+                dmElement.className = 'dm-item';
+                dmElement.onclick = () => openDM(dm.id);
+                
+                dmElement.innerHTML = `
+                    <div class="dm-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="dm-info">
+                        <div class="dm-name">${otherUserData ? otherUserData.displayName : otherUser}</div>
+                        <div class="dm-last-message">${dm.messages.length > 0 ? dm.messages[dm.messages.length - 1].content : 'Henüz mesaj yok'}</div>
+                    </div>
+                `;
+                
+                dmList.appendChild(dmElement);
+            });
+        }
+
+        // Open DM
+        function openDM(dmId) {
+            const dms = JSON.parse(localStorage.getItem('miyav_dms') || '[]');
+            const dm = dms.find(d => d.id === dmId);
+            
+            if (dm) {
+                const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+                const otherUser = dm.participants.find(user => user !== currentUser.username);
+                const users = JSON.parse(localStorage.getItem('miyav_users') || '[]');
+                const otherUserData = users.find(user => user.username === otherUser);
+                
+                // Update chat header
+                const chatName = document.getElementById('chat-name');
+                const chatStatus = document.getElementById('chat-status');
+                
+                if (chatName) chatName.textContent = otherUserData ? otherUserData.displayName : otherUser;
+                if (chatStatus) chatStatus.textContent = 'DM';
+                
+                // Load messages
+                loadDMMessages(dmId);
+                
+                // Store current DM
+                localStorage.setItem('miyav_current_dm', dmId);
+            }
+        }
+
+        // Load DM messages
+        function loadDMMessages(dmId) {
+            const dms = JSON.parse(localStorage.getItem('miyav_dms') || '[]');
+            const dm = dms.find(d => d.id === dmId);
+            
+            if (dm) {
+                const chatMessages = document.getElementById('messages'); // Changed from chatMessages to messages
+                if (chatMessages) {
+                    chatMessages.innerHTML = '';
+                    
+                    dm.messages.forEach(message => {
+                        const messageElement = createMessageElement(message);
+                        chatMessages.appendChild(messageElement);
+                    });
+                    
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+        }
+
+        // Send message to current DM
+        function sendMessageToDM(content) {
+            const currentDM = localStorage.getItem('tgc_current_dm');
+            if (!currentDM) return;
+            
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            const dms = JSON.parse(localStorage.getItem('tgc_dms') || '[]');
+            const dm = dms.find(d => d.id === currentDM);
+            
+            if (dm) {
+                const messageData = {
+                    id: Date.now().toString(),
+                    author: currentUser.displayName,
+                    content: content,
+                    timestamp: new Date()
+                };
+                
+                dm.messages.push(messageData);
+                localStorage.setItem('tgc_dms', JSON.stringify(dms));
+                
+                // Add message to UI
+                addMessageToChat(messageData);
+            }
+        }
+
+        // File selector
+        function openFileSelector() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            input.id = 'temp-file-input';
+            
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleImageUpload(file);
+                }
+                // Remove the input after use
+                setTimeout(() => {
+                    if (input.parentNode) {
+                        input.parentNode.removeChild(input);
+                    }
+                }, 100);
+            });
+            
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        // Handle image upload
+        function handleImageUpload(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+                sendImageMessage(imageData, file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Send image message
+        function sendImageMessage(imageData, fileName) {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+
+            const messageData = {
+                id: Date.now().toString(),
+                author: currentUser.displayName,
+                content: imageData,
+                type: 'image',
+                fileName: fileName,
+                timestamp: new Date()
+            };
+
+            // Add message to chat
+            addMessageToChat(messageData);
+        }
+
+        // Send message
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const content = messageInput.value.trim();
+            
+            if (!content) return;
+            
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Check if we're in a DM
+            const currentDM = localStorage.getItem('tgc_current_dm');
+            if (currentDM) {
+                sendMessageToDM(content);
+            } else {
+                // Send to general chat
+                const messageData = {
+                    id: Date.now().toString(),
+                    author: currentUser.displayName,
+                    content: content,
+                    timestamp: new Date()
+                };
+                
+                addMessageToChat(messageData);
+            }
+            
+            // Clear input
+            messageInput.value = '';
+        }
+
+        // Add message to chat
+        function addMessageToChat(messageData) {
+            const chatMessages = document.getElementById('messages');
+            if (!chatMessages) return;
+
+            const messageElement = createMessageElement(messageData);
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Create message element
+        function createMessageElement(messageData) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.dataset.messageId = messageData.id;
+
+            if (messageData.type === 'image') {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">${messageData.author}</span>
+                            <span class="message-time">${formatTime(messageData.timestamp)}</span>
+                        </div>
+                        <div class="message-text">
+                            <img src="${messageData.content}" alt="${messageData.fileName}" style="max-width: 300px; max-height: 200px; border-radius: 8px; cursor: pointer;" onclick="saveImageToPC(this)">
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-author">${messageData.author}</span>
+                            <span class="message-time">${formatTime(messageData.timestamp)}</span>
+                        </div>
+                        <div class="message-text">${messageData.content}</div>
+                    </div>
+                `;
+            }
+
+            return messageDiv;
+        }
+
+        // Save image to PC
+        function saveImageToPC(imgElement) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = imgElement.naturalWidth;
+            canvas.height = imgElement.naturalHeight;
+            ctx.drawImage(imgElement, 0, 0);
+            
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'image.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Format time
+        function formatTime(date) {
+            return new Date(date).toLocaleTimeString('tr-TR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Show profile modal
+        function showProfileModal(username) {
+            const profileName = document.getElementById('profile-name');
+            const profileDisplayName = document.getElementById('profile-display-name');
+            const profileStatusText = document.getElementById('profile-status-text');
+            const currentGame = document.getElementById('current-game');
+            const gameTime = document.getElementById('game-time');
+            const favoriteGame = document.getElementById('favorite-game');
+            const totalGameTime = document.getElementById('total-game-time');
+            const lastGame = document.getElementById('last-game');
+            
+            if (profileName) profileName.textContent = `${username} Profili`;
+            if (profileDisplayName) profileDisplayName.textContent = username;
+            if (profileStatusText) profileStatusText.textContent = 'Çevrimiçi';
+            
+            // Check if user is actually playing a game
+            const isPlaying = checkIfUserIsPlaying(username);
+            
+            if (isPlaying) {
+                if (currentGame) currentGame.textContent = isPlaying.game;
+                if (gameTime) gameTime.textContent = isPlaying.time;
+                if (favoriteGame) favoriteGame.textContent = isPlaying.game;
+            } else {
+                if (currentGame) currentGame.textContent = 'Oyun oynamıyor';
+                if (gameTime) gameTime.textContent = '0 dakika';
+                if (favoriteGame) favoriteGame.textContent = 'Veri yok';
+            }
+            
+            // Get user's game stats
+            const userStats = getUserGameStats(username);
+            if (totalGameTime) totalGameTime.textContent = userStats.totalTime;
+            if (lastGame) lastGame.textContent = userStats.lastGame;
+            
+            document.getElementById('profile-modal').classList.add('show');
+        }
+
+        // Check if user is playing a game
+        function checkIfUserIsPlaying(username) {
+            // Real game detection - check running processes
+            const games = [
+                { name: 'Counter-Strike 2', process: 'cs2.exe' },
+                { name: 'Valorant', process: 'VALORANT.exe' },
+                { name: 'League of Legends', process: 'League of Legends.exe' },
+                { name: 'Dota 2', process: 'dota2.exe' },
+                { name: 'Fortnite', process: 'FortniteClient.exe' },
+                { name: 'PUBG', process: 'PUBG.exe' },
+                { name: 'Apex Legends', process: 'r5apex.exe' },
+                { name: 'Overwatch', process: 'Overwatch.exe' },
+                { name: 'Rocket League', process: 'RocketLeague.exe' },
+                { name: 'Minecraft', process: 'javaw.exe' }
+            ];
+            
+            // For now, return null (not playing) - in real app this would check actual processes
+            // In a real Electron app, you would use require('child_process').exec to check running processes
+            return null;
+            
+            // Example of how it would work in real app:
+            /*
+            const { exec } = require('child_process');
+            exec('tasklist', (error, stdout) => {
+                if (error) return null;
+                
+                for (let game of games) {
+                    if (stdout.includes(game.process)) {
+                        return {
+                            game: game.name,
+                            time: calculateGameTime(game.process)
+                        };
+                    }
+                }
+                return null;
+            });
+            */
+        }
+
+        // Get user's game stats
+        function getUserGameStats(username) {
+            // For now, return empty stats since no game is detected
+            const stats = {
+                totalTime: '0 saat',
+                lastGame: 'Hiç oyun oynamamış'
+            };
+            
+            return stats;
+        }
+
+        // Send message to profile
+        function sendMessageToProfile() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Get profile user name
+            const profileDisplayName = document.getElementById('profile-display-name');
+            const profileUser = profileDisplayName ? profileDisplayName.textContent : '';
+            
+            if (profileUser === currentUser.displayName) {
+                alert('Kendinize mesaj gönderemezsiniz.');
+                return;
+            }
+            
+            // Create DM with this user
+            createDM(currentUser.username, profileUser);
+            hideModal('profile-modal');
+            alert(`${profileUser} ile DM oluşturuldu! Mesaj gönderebilirsiniz.`);
+        }
+
+        // Add friend from profile
+        function addFriendFromProfile() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            // Get profile user name
+            const profileDisplayName = document.getElementById('profile-display-name');
+            const profileUser = profileDisplayName ? profileDisplayName.textContent : '';
+            
+            if (profileUser === currentUser.displayName) {
+                alert('Kendinizi arkadaş olarak ekleyemezsiniz.');
+                return;
+            }
+            
+            // Check if already friends
+            const friends = JSON.parse(localStorage.getItem('miyav_friends') || '[]');
+            const alreadyFriend = friends.find(friend => friend.username === profileUser);
+            
+            if (alreadyFriend) {
+                alert('Bu kullanıcı zaten arkadaşınız.');
+                return;
+            }
+            
+            // Add friend
+            const newFriend = {
+                username: profileUser,
+                displayName: profileUser,
+                status: 'Çevrimiçi',
+                addedAt: new Date()
+            };
+            
+            friends.push(newFriend);
+            localStorage.setItem('miyav_friends', JSON.stringify(friends));
+            
+            hideModal('profile-modal');
+            alert(`${profileUser} arkadaş olarak eklendi!`);
+            
+            // Update friends list
+            updateFriendsList();
+        }
+
+        // Show profile modal from more options
+        function showMoreOptions() {
+            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+            if (currentUser) {
+                showProfileModal(currentUser.displayName);
+            } else {
+                alert('Profil görüntülemek için giriş yapın.');
+            }
+        }
+
+        // Update friends list
+        function updateFriendsList() {
+            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+            if (!currentUser) return;
+            
+            const friends = JSON.parse(localStorage.getItem('miyav_friends') || '[]');
+            const friendsList = document.getElementById('friends-list');
+            
+            if (!friendsList) return;
+            
+            friendsList.innerHTML = '';
+            
+            if (friends.length === 0) {
+                friendsList.innerHTML = '<div class="empty-state">Henüz arkadaşınız yok</div>';
+                return;
+            }
+            
+            friends.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                friendElement.onclick = () => showProfileModal(friend.displayName);
+                
+                friendElement.innerHTML = `
+                    <div class="friend-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.displayName}</div>
+                        <div class="friend-status">${friend.status}</div>
+                    </div>
+                `;
+                
+                friendsList.appendChild(friendElement);
+            });
+        }
+
+        // Close right panel
+        function closeRightPanel() {
+            document.getElementById('right-panel').classList.remove('show');
+        }
+
+        // Update right panel
+        function updateRightPanel() {
+            const currentUser = JSON.parse(localStorage.getItem('miyav_current_user'));
+            if (!currentUser) return;
+            
+            const panelUserName = document.getElementById('panel-user-name');
+            const panelUserStatus = document.getElementById('panel-user-status');
+            const panelCurrentGame = document.getElementById('panel-current-game');
+            
+            if (panelUserName) {
+                panelUserName.textContent = currentUser.displayName;
+            }
+            
+            if (panelUserStatus) {
+                panelUserStatus.textContent = 'Çevrimiçi';
+            }
+            
+            if (panelCurrentGame) {
+                const gameStatus = checkIfUserIsPlaying(currentUser.username);
+                if (gameStatus) {
+                    panelCurrentGame.innerHTML = `
+                        <span class="game-name">${gameStatus.game}</span>
+                        <span class="game-time">${gameStatus.time}</span>
+                    `;
+                } else {
+                    panelCurrentGame.innerHTML = `
+                        <span class="game-name">Oyun oynamıyor</span>
+                        <span class="game-time">0 dakika</span>
+                    `;
+                }
+            }
+        }
+
+        // Delete account function
+        function deleteAccount() {
+            if (confirm('Bu hesabı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) {
+                const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+                if (currentUser) {
+                    const users = JSON.parse(localStorage.getItem('tgc_users') || '[]');
+                    const initialUsersCount = users.length;
+                    const updatedUsers = users.filter(u => u.username !== currentUser.username);
+                    localStorage.setItem('tgc_users', JSON.stringify(updatedUsers));
+
+                    if (updatedUsers.length < initialUsersCount) {
+                        alert('Hesabınız başarıyla silindi.');
+                        localStorage.removeItem('tgc_current_user');
+                        localStorage.removeItem('tgc_friends');
+                        localStorage.removeItem('tgc_dms');
+                        localStorage.removeItem('tgc_dm_messages'); // Assuming dm_messages are also user-specific
+                        updateUserInterface();
+                        closeRightPanel();
+                    } else {
+                        alert('Hesap silinemedi. Kullanıcı adı bulunamadı.');
+                    }
+                } else {
+                    alert('Giriş yapmanız gerekiyor.');
+                }
+            }
+        }
+
+        // Save user settings
+        function saveUserSettings() {
+            const currentUser = JSON.parse(localStorage.getItem('tgc_current_user'));
+            if (!currentUser) {
+                alert('Giriş yapmanız gerekiyor.');
+                return;
+            }
+            
+            const usernameInput = document.getElementById('settings-username');
+            const displayNameInput = document.getElementById('settings-display-name');
+            const currentPasswordInput = document.getElementById('settings-current-password');
+            const newPasswordInput = document.getElementById('settings-new-password');
+            const confirmPasswordInput = document.getElementById('settings-confirm-password');
+            
+            if (!usernameInput || !displayNameInput) {
+                alert('Form alanları bulunamadı.');
+                return;
+            }
+            
+            const newUsername = usernameInput.value.trim();
+            const newDisplayName = displayNameInput.value.trim();
+            const currentPassword = currentPasswordInput ? currentPasswordInput.value : '';
+            const newPassword = newPasswordInput ? newPasswordInput.value : '';
+            const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
+            
+            // Validate inputs
+            if (!newUsername || !newDisplayName) {
+                alert('Kullanıcı adı ve görünen ad boş olamaz.');
+                return;
+            }
+            
+            // Check if username is already taken by another user
+            const users = JSON.parse(localStorage.getItem('tgc_users') || '[]');
+            const existingUser = users.find(u => u.username === newUsername && u.username !== currentUser.username);
+            if (existingUser) {
+                alert('Bu kullanıcı adı zaten kullanılıyor.');
+                return;
+            }
+            
+            // Update user data
+            const updatedUser = {
+                ...currentUser,
+                username: newUsername,
+                displayName: newDisplayName
+            };
+            
+            // Update password if provided
+            if (newPassword) {
+                if (newPassword !== confirmPassword) {
+                    alert('Yeni şifreler eşleşmiyor.');
+                    return;
+                }
+                if (newPassword.length < 6) {
+                    alert('Şifre en az 6 karakter olmalıdır.');
+                    return;
+                }
+                updatedUser.password = btoa(newPassword);
+            }
+            
+            // Update users array
+            const userIndex = users.findIndex(u => u.username === currentUser.username);
+            if (userIndex !== -1) {
+                users[userIndex] = updatedUser;
+                localStorage.setItem('tgc_users', JSON.stringify(users));
+            }
+            
+            // Update current user
+            localStorage.setItem('tgc_current_user', JSON.stringify(updatedUser));
+            
+            // Update UI
+            updateUserInterface();
+            updateRightPanel();
+            
+            alert('Ayarlar başarıyla kaydedildi.');
+            hideModal('user-settings-modal');
+        }
+
+        // Show message context menu
+        function showMessageContextMenu(event) {
+            const messageElement = event.target.closest('.message');
+            if (!messageElement) {
+                return;
+            }
+            
+            // Check if it's a text input (don't show context menu for text input)
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            // Prevent default context menu
+            event.preventDefault();
+            
+            // Remove existing context menu
+            const existingMenu = document.querySelector('.message-context-menu');
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+            
+            const contextMenu = document.createElement('div');
+            contextMenu.className = 'message-context-menu';
+            contextMenu.style.cssText = `
+                position: absolute;
+                left: ${event.pageX}px;
+                top: ${event.pageY}px;
+                z-index: 1000;
+                background: linear-gradient(135deg, #2c3e50, #34495e);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 8px;
+                padding: 8px 0;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+                min-width: 150px;
+            `;
+            
+            // Check if message contains image
+            const hasImage = messageElement.querySelector('img');
+            
+            if (hasImage) {
+                contextMenu.innerHTML = `
+                    <div class="context-menu-item" data-action="save-image" style="padding: 8px 16px; cursor: pointer; color: white; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-download"></i>
+                        PC'ye Kaydet
+                    </div>
+                    <div class="context-menu-item" data-action="delete" style="padding: 8px 16px; cursor: pointer; color: white; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trash"></i>
+                        Sil
+                    </div>
+                `;
+            } else {
+                contextMenu.innerHTML = `
+                    <div class="context-menu-item" data-action="delete" style="padding: 8px 16px; cursor: pointer; color: white; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-trash"></i>
+                        Sil
+                    </div>
+                `;
+            }
+            
+            document.body.appendChild(contextMenu);
+            
+            // Handle context menu actions
+            contextMenu.addEventListener('click', (e) => {
+                const menuItem = e.target.closest('.context-menu-item');
+                if (menuItem) {
+                    const action = menuItem.dataset.action;
+                    handleContextMenuAction(action, messageElement, e.target);
+                    contextMenu.remove();
+                }
+            });
+            
+            // Remove context menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', () => {
+                    contextMenu.remove();
+                }, { once: true });
+            }, 100);
+        }
+
+        // Handle context menu actions
+        function handleContextMenuAction(action, messageElement, targetElement) {
+            const messageId = messageElement.dataset.messageId;
+            
+            switch (action) {
+                case 'save-image':
+                    const imgElement = messageElement.querySelector('img');
+                    if (imgElement) {
+                        saveImageToPC(imgElement);
+                    }
+                    break;
+                    
+                case 'delete':
+                    deleteMessage(messageElement);
+                    break;
+            }
+        }
+
+        // Delete message
+        function deleteMessage(messageElement) {
+            if (confirm('Bu mesajı silmek istediğinizden emin misiniz?')) {
+                messageElement.remove();
+            }
+        }
+    </script>
+</body>
+</html> 
